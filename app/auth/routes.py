@@ -1,12 +1,13 @@
-from flask import render_template, redirect, url_for, flash, request, Blueprint
+from flask import render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, current_user, login_required
 from app import db
-from app.auth.forms import LoginForm, RegistrationForm
+from werkzeug.urls import url_parse
+from app.auth.forms import LoginForm, RegistrationForm, UpdateAccountForm
 from app.models.models import User, Post
-
+from app.auth.utils import save_picture
+import os
+from app.auth.emails import send_email, send_change_email
 from . import users
-
-
 
 
 
@@ -44,10 +45,54 @@ def register():
         user = User(username=form.username.data, email=form.email.data, password=form.password.data)
         db.session.add(user)
         db.session.commit()
-        print("sucess")
-        flash('you are successfully registerd!')
+        send_email(user)
+        flash('A confirmation email has been sent to you by email.')
         return redirect(url_for('users.login'))
     return render_template('public/auth/register.html', form=form)
+
+
+@users.route('/confirm/<token>')
+@login_required
+def confirm_mail(token):
+    if current_user.confirmed:
+        return redirect(url_for('main.home'))
+    if current_user.confirm_email(token):
+        flash('You have confirmed your account. Thanks!')
+    else:
+        flash('The confirmation link is invalid or has expired.')
+    return redirect(url_for('main.home'))
+
+
+
+@users.before_app_request
+def before_request():
+    if current_user.is_authenticated:
+        if not current_user.confirmed and request.endpoint[:5]!='users':
+            return redirect(url_for('users.unconfirmed'))
+
+
+@users.route('/unconfirmed')
+def unconfirmed():
+    if current_user.is_anonymous or current_user.confirmed:
+        return redirect(url_for('main.home'))
+    return render_template('public/auth/unconfirmed.html')
+
+@users.route('/confirm')
+@login_required
+def resend_confirmation():
+    send_email(current_user)
+    flash('A new confirmation email has been sent to you by email.')
+    return redirect(url_for('main.home'))
+
+@users.route('/change_email/<token>')
+@login_required
+def change_email(token):
+    if current_user.change_email(token):
+        db.session.commit()
+        flash('Your email address has been updated.')
+    else:
+        flash('Invalid request.')
+    return redirect(url_for('users.account'))
 
 
 @users.route("/account", methods=['GET', 'POST'])
@@ -59,9 +104,14 @@ def account():
             picture_file = save_picture(form.picture.data)
             current_user.image_file = picture_file
         current_user.username = form.username.data
-        current_user.email = form.email.data
+        if form.username.data != current_user.username:
+            current_user.username = form.username.data
+            flash('Your username has been updated')
+        if form.email.data != current_user.email:    
+            newemail = form.email.data.lower()
+            send_change_email(user=current_user, email=newemail)
+            flash('A confirmation email has been sent to you by email.')
         db.session.commit()
-        flash('Your account has been updated!', 'success')
         return redirect(url_for('users.account'))
     elif request.method == 'GET':
         form.username.data = current_user.username
