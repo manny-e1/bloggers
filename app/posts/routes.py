@@ -14,7 +14,8 @@ def new_post():
     form = PostForm()      
     if form.validate_on_submit():
         coverImage = save_picture(form.picture.data)
-        post = Post(title=form.title.data, description=form.description.data, tag=form.tag.data, cover_image=coverImage, content=form.content.data, author=current_user)
+        post = Post(title=form.title.data, description=form.description.data, cover_image=coverImage, 
+        content=form.content.data, author=current_user)
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'success')
@@ -69,3 +70,15 @@ def delete_post(post_id):
     db.session.commit()
     flash('Your post has been deleted!', 'success')
     return redirect(url_for('main.home'))
+
+@posts.route('/like/<int:post_id>/<action>')
+@login_required
+def like_action(post_id, action):
+    post = Post.query.filter_by(id=post_id).first_or_404()
+    if action == 'like':
+        current_user.like_post(post)
+        db.session.commit()
+    if action == 'unlike':
+        current_user.unlike_post(post)
+        db.session.commit()
+    return redirect(request.referrer)

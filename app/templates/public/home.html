@@ -11,8 +11,19 @@
             </div>
             <h2><a class="article-title" href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a></h2>
             <p class="article-content">{{ post.content|safe }}</p>
+            {% if current_user.is_authenticated %}
+              {% if current_user.has_liked_post(post) %}
+              <a href="{{ url_for('posts.like_action', post_id=post.id, action='unlike') }}">Unlike</a>
+              {% else %}
+              <a href="{{ url_for('posts.like_action', post_id=post.id, action='like') }}">Like</a>
+              {% endif %}
+              {{ post.likes.count() }} likes
+            {% else %}
+              {{ post.likes.count() }} likes
+            {% endif %}
           </div>
         </article>
+     
     {% endfor %}
     {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
       {% if page_num %}
