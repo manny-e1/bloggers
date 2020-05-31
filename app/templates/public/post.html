@@ -10,6 +10,9 @@
         {% if post.author == current_user %}
           <div>
             <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('posts.update_post', post_id=post.id) }}">Update</a>
+            <form action="{{ url_for('posts.delete_post', post_id=post.id) }}" method="POST">
+              <input class="btn btn-danger" type="submit" value="Delete">
+            </form>
             <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
           </div>
         {% endif %}
@@ -19,7 +22,7 @@
     </div>
   </article>
   <!-- Modal -->
-  <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <!-- <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -36,7 +39,7 @@
         </div>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <form action="" method="post">
     <div class="comment-form">

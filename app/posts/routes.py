@@ -5,15 +5,16 @@ from app import db
 from app.models.models import Post, Comment
 from app.posts.forms import PostForm
 from app.comment.form import CommentForm
-
+from app.auth.utils import save_picture
 from . import posts
 
 @posts.route("/post/new", methods=['GET', 'POST'])
 @login_required
 def new_post():
-    form = PostForm()
+    form = PostForm()      
     if form.validate_on_submit():
-        post = Post(title=form.title.data, content=form.content.data, author=current_user)
+        coverImage = save_picture(form.picture.data)
+        post = Post(title=form.title.data, description=form.description.data, tag=form.tag.data, cover_image=coverImage, content=form.content.data, author=current_user)
         db.session.add(post)
         db.session.commit()
         flash('Your post has been created!', 'success')
