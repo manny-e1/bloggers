@@ -11,4 +11,5 @@ class PostForm(FlaskForm):
     # tag = SelectField('tag', choices = dropdown, validators=[DataRequired()])
     picture = FileField('Cover Image', validators=[FileAllowed(['jpg', 'png'])])
     content = TextAreaField('Content', validators=[DataRequired()])
+    draft = SubmitField('Draft')
     submit = SubmitField('Post')

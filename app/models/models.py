@@ -23,6 +23,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     confirmed = db.Column(db.Boolean, default=False)
     posts = db.relationship('Post', backref='author', lazy=True)
+    drafts = db.relationship('Draft', backref='user', lazy=True)
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
     followed = db.relationship(
         'User', secondary=followers,
@@ -160,3 +161,17 @@ class Comment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     def __repr__(self):
         return f"Comment('{self.body}','{self.timestamp}')"
+
+
+class Draft(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(100), nullable=False)
+    # tag = db.Column(db.String(20), nullable=False)
+    description = db.Column(db.String(300), nullable=False)
+    cover_image = db.Column(db.String(20), nullable=False, default='defaultpost.jpg')
+    date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    content = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+   
+    def __repr__(self):
+        return f"Post('{self.title}', '{self.date_posted}')" 

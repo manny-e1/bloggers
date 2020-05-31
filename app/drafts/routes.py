@@ -2,7 +2,7 @@ from flask import (render_template, url_for, flash,
                    redirect, request, abort)
 from flask_login import current_user, login_required
 from app import db
-from app.models.models import Post, Comment, Draft
+from app.models.models import Post, Comment
 from app.posts.forms import PostForm
 from app.comment.form import CommentForm
 from app.auth.utils import save_picture
@@ -14,19 +14,12 @@ def new_post():
     form = PostForm()      
     if form.validate_on_submit():
         coverImage = save_picture(form.picture.data)
-        if form.draft.data:
-            draft = Draft(title=form.title.data, description=form.description.data,   cover_image=coverImage, 
-            content=form.content.data, user=current_user)
-            db.session.add(draft)
-            db.session.commit()
-            flash('Your draft has been created!', 'success')
-        if form.submit.data:
-            post = Post(title=form.title.data, description=form.description.data,   cover_image=coverImage, 
-            content=form.content.data, author=current_user)
-            db.session.add(post)
-            db.session.commit()
-            flash('Your post has been created!', 'success')
-            return redirect(url_for('main.home'))
+        post = Post(title=form.title.data, description=form.description.data, cover_image=coverImage, 
+        content=form.content.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
+        flash('Your post has been created!', 'success')
+        return redirect(url_for('main.home'))
     return render_template('public/create_post.html', title='New Post',
                            form=form, legend='New Post')
 
