@@ -2,8 +2,9 @@ from flask import (render_template, url_for, flash,
                    redirect, request, abort)
 from flask_login import current_user, login_required
 from app import db
-from app.models.models import Post
+from app.models.models import Post, Comment
 from app.posts.forms import PostForm
+from app.comment.form import CommentForm
 
 from . import posts
 
@@ -21,10 +22,20 @@ def new_post():
                            form=form, legend='New Post')
 
 
-@posts.route("/post/<int:post_id>")
+@posts.route("/post/<int:post_id>", methods=["GET","POST"])
 def post(post_id):
     post = Post.query.get_or_404(post_id)
-    return render_template('public/post.html', title=post.title, post=post)
+    form = CommentForm()
+    if form.validate_on_submit:
+        if form.body.data != None:
+            comment = Comment(body=form.body.data, post=post,
+                            author=current_user)
+            db.session.add(comment)
+            db.session.commit()
+            return redirect(url_for('posts.post',post_id=post.id))
+    comments = Comment.query.filter_by(post=post)\
+        .order_by(Comment.timestamp.desc())
+    return render_template('public/post.html', title=post.title, post=post, comments=comments, form=form)
 
 
 @posts.route("/post/<int:post_id>/update", methods=['GET', 'POST'])

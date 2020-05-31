@@ -1,6 +1,24 @@
 {% extends "public/layout.html" %}
 {% block content %}
-    <h1 class="mb-3">Posts by {{ user.username }} ({{ posts.total }})</h1>
+<table>
+  <tr valign="top">
+      <td> <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + user.image_file) }}"></td>
+      <td>
+        <h1 class="mb-3">Posts by {{ user.username }} ({{ posts.total }})</h1>
+          <p>{{ user.followers.count() }} followers, {{ user.followed.count() }} following.</p>
+          {% if user == current_user %}
+          <p><a href="{{ url_for('users.account') }}">Edit your profile</a></p>
+          {% elif not current_user.is_following(user) %}
+          <p><a href="{{ url_for('users.follow', username=user.username) }}">Follow</a></p>
+          {% else %}
+          <p><a href="{{ url_for('users.unfollow', username=user.username) }}">Unfollow</a></p>
+          {% endif %}
+      </td>
+  </tr>
+</table>
+
+
+    <!-- <h1 class="mb-3">Posts by {{ user.username }} ({{ posts.total }})</h1> -->
     {% for post in posts.items %}
         <article class="media content-section">
           <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">

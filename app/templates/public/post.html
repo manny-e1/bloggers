@@ -1,4 +1,5 @@
 {% extends "public/layout.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
 {% block content %}
   <article class="media content-section">
     <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
@@ -36,4 +37,37 @@
       </div>
     </div>
   </div>
+
+  <form action="" method="post">
+    <div class="comment-form">
+      {{ wtf.quick_form(form) }}
+  </div>
+  </form>
+
+  <h4 id="comments">Comments</h4>
+<div class="comment-form">
+  <ul class="comments">
+    {% for comment in post.comments %}
+    <li class="comment">
+        <div class="comment-thumbnail">
+            <a href="{{ url_for('users.user_posts', username=comment.author.username) }}">
+                <img class="rounded-circle article-img" src="{{url_for('static', filename='profile_pics/' + comment.author.image_file)}}">
+            </a>
+        </div>
+        <div class="comment-content">
+            <!-- <div class="comment-date">{{ comment.timestamp }}</div> -->
+            <div class="comment-author"><a href="{{ url_for('users.user_posts', username=comment.author.username) }}">{{ comment.author.username }} {{ comment.body }}</a></div>
+            <div class="comment-body">
+                <!-- {% if comment.body_html %} -->
+                    
+                <!-- {% else %}
+                    {{ comment.body }} -->
+                <!-- {% endif %} -->
+            </div>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+</div>
+
 {% endblock content %}
