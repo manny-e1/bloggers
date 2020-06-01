@@ -16,16 +16,17 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     form = LoginForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
-        if user is None:
-            flash('Invalid username or password')
-            return redirect(url_for('users.login'))
-        login_user(user, remember=form.remember_me.data)
-        next_page = request.args.get('next')
-        if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('main.home')
-        return redirect(next_page)
+    if request.method == 'POST':  
+        if form.validate_on_submit():
+            user = User.query.filter_by(username=form.username.data).first()
+            if user is None:
+                flash('Invalid username or password')
+                return redirect(url_for('users.login'))
+            login_user(user, remember=form.remember_me.data)
+            next_page = request.args.get('next')
+            if not next_page or url_parse(next_page).netloc != '':
+                next_page = url_for('main.home')
+            return redirect(next_page)
     return render_template('public/auth/login.html',  form=form)
 
 @users.route('/logout')
@@ -41,13 +42,14 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     form = RegistrationForm()
-    if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data, password=form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        send_email(user)
-        flash('A confirmation email has been sent to you by email.')
-        return redirect(url_for('users.login'))
+    if request.method == 'POST':  
+        if form.validate_on_submit():
+            user = User(username=form.username.data, email=form.email.data, password=form.password.data)
+            db.session.add(user)
+            db.session.commit()
+            send_email(user)
+            flash('A confirmation email has been sent to you by email.')
+            return redirect(url_for('users.login'))
     return render_template('public/auth/register.html', form=form)
 
 
@@ -99,20 +101,21 @@ def change_email(token):
 @login_required
 def account():
     form = UpdateAccountForm()
-    if form.validate_on_submit():
-        if form.picture.data:
-            picture_file = save_picture(form.picture.data)
-            current_user.image_file = picture_file
-        current_user.username = form.username.data
-        if form.username.data != current_user.username:
+    if request.method == 'POST':  
+        if form.validate_on_submit():
+            if form.picture.data:
+                picture_file = save_picture(form.picture.data)
+                current_user.image_file = picture_file
             current_user.username = form.username.data
-            flash('Your username has been updated')
-        if form.email.data != current_user.email:    
-            newemail = form.email.data.lower()
-            send_change_email(user=current_user, email=newemail)
-            flash('A confirmation email has been sent to you by email.')
-        db.session.commit()
-        return redirect(url_for('users.account'))
+            if form.username.data != current_user.username:
+                current_user.username = form.username.data
+                flash('Your username has been updated')
+            if form.email.data != current_user.email:    
+                newemail = form.email.data.lower()
+                send_change_email(user=current_user, email=newemail)
+                flash('A confirmation email has been sent to you by email.')
+            db.session.commit()
+            return redirect(url_for('users.account'))
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.email.data = current_user.email

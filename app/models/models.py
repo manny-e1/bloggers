@@ -131,7 +131,7 @@ class User(db.Model, UserMixin):
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    # tag = db.Column(db.String(20), nullable=False)
+    tag = db.Column(db.String(20), nullable=False)
     description = db.Column(db.String(300), nullable=False)
     cover_image = db.Column(db.String(20), nullable=False, default='defaultpost.jpg')
     date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)

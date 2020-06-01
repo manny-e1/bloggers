@@ -2,32 +2,17 @@ from flask import (render_template, url_for, flash,
                    redirect, request, abort)
 from flask_login import current_user, login_required
 from app import db
-from app.models.models import Post, Comment
+from app.models.models import Draft
 from app.posts.forms import PostForm
-from app.comment.form import CommentForm
 from app.auth.utils import save_picture
-from . import posts
-
-@posts.route("/post/new", methods=['GET', 'POST'])
-@login_required
-def new_post():
-    form = PostForm()      
-    if form.validate_on_submit():
-        coverImage = save_picture(form.picture.data)
-        post = Post(title=form.title.data, description=form.description.data, cover_image=coverImage, 
-        content=form.content.data, author=current_user)
-        db.session.add(post)
-        db.session.commit()
-        flash('Your post has been created!', 'success')
-        return redirect(url_for('main.home'))
-    return render_template('public/create_post.html', title='New Post',
-                           form=form, legend='New Post')
+from . import drafts
 
 
 @posts.route("/post/<int:post_id>", methods=["GET","POST"])
 def post(post_id):
     post = Post.query.get_or_404(post_id)
     form = CommentForm()
+    if request.method == 'POST':  
     if form.validate_on_submit:
         if form.body.data != None:
             comment = Comment(body=form.body.data, post=post,
