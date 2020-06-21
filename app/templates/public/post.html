@@ -1,7 +1,7 @@
 {% extends "public/layout.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 {% block content %}
-  <article class="media content-section">
+  <div class="container">
     <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
     <div class="media-body">
       <div class="article-metadata">
@@ -9,68 +9,57 @@
         <small class="text-muted">{{ post.date_posted.strftime('%Y-%m-%d') }}</small>
         {% if post.author == current_user %}
           <div>
-            <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('posts.update_post', post_id=post.id) }}">Update</a>
-            <form action="{{ url_for('posts.delete_post', post_id=post.id) }}" method="POST">
-              <input class="btn btn-danger" type="submit" value="Delete">
-            </form>
-            <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
-          </div>
+            <a  href="{{ url_for('posts.update_post', post_id=post.id) }}"><button><i class="fa fa-pen"></i></button></a>
+            <a  onclick=" return confirm('Are you sure you want to delete this?')" href="{{ url_for('posts.delete_post', post_id=post.id) }}"><button><i class="fa fa-trash"></i></button></a>
+            
         {% endif %}
-      </div>
+      </div>  
       <h2 class="article-title">{{ post.title }}</h2>
       <p class="article-content">{{ post.content|safe }}</p>
     </div>
-  </article>
-  <!-- Modal -->
-  <!-- <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="deleteModalLabel">Delete Post?</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          <form action="{{ url_for('posts.delete_post', post_id=post.id) }}" method="POST">
-            <input class="btn btn-danger" type="submit" value="Delete">
-          </form>
-        </div>
-      </div>
-    </div>
-  </div> -->
-
+  </div>
+  <h3 id="comments">Comments</h3>
+  <div class="comment-form">
+    <ul class="comments">
+      {% for comment in post.comments %}
+      <li class="comment">
+          <div class="comment-thumbnail">
+              <a href="{{ url_for('users.user_posts', username=comment.author.username) }}">
+                  <img class="rounded-circle article-img" src="{{url_for('static', filename='profile_pics/' + comment.author.image_file)}}">
+              </a>
+          </div>
+          <div class="comment-content">
+              <!-- <div class="comment-date">{{ comment.timestamp }}</div> -->
+              <div class="comment-author"><a href="{{ url_for('users.user_posts', username=comment.author.username) }}">{{ comment.author.username }} {{ comment.body }}</a></div>
+              <div class="comment-body">
+                  <!-- {% if comment.body_html %} -->
+                      
+                  <!-- {% else %}
+                      {{ comment.body }} -->
+                  <!-- {% endif %} -->
+              </div>
+          </div>
+      </li>
+      {% endfor %}
+  </ul>
+  </div>
+  
+  <h3>Leave a Comment</h3>
   <form action="" method="post">
     <div class="comment-form">
       {{ wtf.quick_form(form) }}
   </div>
   </form>
 
-  <h4 id="comments">Comments</h4>
-<div class="comment-form">
-  <ul class="comments">
-    {% for comment in post.comments %}
-    <li class="comment">
-        <div class="comment-thumbnail">
-            <a href="{{ url_for('users.user_posts', username=comment.author.username) }}">
-                <img class="rounded-circle article-img" src="{{url_for('static', filename='profile_pics/' + comment.author.image_file)}}">
-            </a>
-        </div>
-        <div class="comment-content">
-            <!-- <div class="comment-date">{{ comment.timestamp }}</div> -->
-            <div class="comment-author"><a href="{{ url_for('users.user_posts', username=comment.author.username) }}">{{ comment.author.username }} {{ comment.body }}</a></div>
-            <div class="comment-body">
-                <!-- {% if comment.body_html %} -->
-                    
-                <!-- {% else %}
-                    {{ comment.body }} -->
-                <!-- {% endif %} -->
-            </div>
-        </div>
-    </li>
-    {% endfor %}
-</ul>
-</div>
-
+ 
 {% endblock content %}
+{% block script %}
+    {{ super() }}
+     <!-- --------- Owl-Carousel js ------------------->
+     <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+     <!-- ------------ AOS js Library  ------------------------- -->
+     <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
+     
+     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+{% endblock script %}

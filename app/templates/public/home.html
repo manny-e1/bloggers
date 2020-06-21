@@ -1,7 +1,12 @@
 {% extends "public/layout.html" %}
 
+{% block head_css %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/Style.css') }}">
+{% endblock head_css %}
+
 {% block content %}
-    {% for post in posts.items %}
+    <!-- {% for post in posts.items %}
         <article class="media content-section">
           <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
           <div class="media-body">
@@ -35,5 +40,229 @@
       {% else %}
         ...
       {% endif %}
-    {% endfor %}
+    {% endfor %} -->
+       
+ <section>
+    <div class="blog">
+        <div class="container">
+            <div class="owl-carousel owl-theme blog-post">
+              {% for post in posts.items %}
+                <div class="blog-content" data-aos="fade-right" data-aos-delay="200">
+                    <img class="post-content-img" height=200vh" src="{{ url_for('static', filename='profile_pics/' + post.cover_image) }}" alt="post-1">
+                    <div class="blog-title">
+                        <a href="{{ url_for('posts.post', post_id=post.id) }}"><h3>{{post.author.username}}</h3></a>
+                        <button class="btn btn-blog">{{ post.tag }}</button>
+                        <span>2 minutes</span>
+                    </div>
+                </div>
+                {% endfor %}
+                <div class="owl-navigation">
+                  <span class="owl-nav-prev"><i class="fas fa-long-arrow-alt-left"></i></span>
+                  <span class="owl-nav-next"><i class="fas fa-long-arrow-alt-right"></i></span>
+              </div>
+              </div>
+              
+            
+        </div>
+    </div>
+</section>
+
+<hr>
+    <section class="container">
+      <div class="site-content">
+          <div class="posts">
+            {% for post in posts.items %}
+              <div class="post-content" data-aos="zoom-in" data-aos-delay="200">
+                
+                  <div class="post-image">
+                      <div>
+                        <img  src="{{ url_for('static', filename='profile_pics/' + post.cover_image) }}" class="img" alt="blog1">
+                      </div>
+                      <div class="post-info flex-row">
+                        <span><a href="{{ url_for('users.user_posts', username=post.author.username) }}"><i class="fas fa-user text-gray"></i>&nbsp;&nbsp;{{ post.author.username }}</a></span>
+                          <span><i class="fas fa-calendar-alt text-gray"></i>&nbsp;&nbsp;Jan 27, 2020</span>
+                          <span>{% if current_user.is_authenticated %}
+                            {% if current_user.has_liked_post(post) %}
+                            <a href="{{ url_for('posts.like_action', post_id=post.id, action='unlike') }}">Unlike</a>
+                            {% else %}
+                            <a href="{{ url_for('posts.like_action', post_id=post.id, action='like') }}">Like</a>
+                            {% endif %}
+                            {{ post.likes.count() }}
+                          {% else %}
+                            {{ post.likes.count() }}
+                          {% endif %}</span>
+                          <span>{{post.comments.count()}} comments</span>
+                      </div>
+                  </div>
+                  <div class="post-title">
+                    <a href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a>
+                    <p>{{ post.description }} </p>
+                    <a href="{{ url_for('posts.post', post_id=post.id) }}"><button class="btn post-btn">Read More &nbsp; <i class="fas fa-arrow-right"></i></button></a>
+                  </div>
+              </div>
+              {% endfor %}
+              <hr>
+              <div class="pagination flex-row">
+              {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+              
+                {% if page_num %}
+                {% if posts.page == page_num %}
+                  <a href="{{ url_for('main.home', page=page_num) }}" class="pages">{{ page_num }}</a>
+                {% else %}
+                  <a href="{{ url_for('main.home', page=page_num) }}" class="pages">{{ page_num }}</a>
+                {% endif %}
+                {% else %}
+                ...
+              {% endif %}
+              {% endfor %}
+              </div>
+             
+          
+          </div>
+          <aside class="sidebar">
+              <div class="category">
+                  <h2>Category</h2>
+                  <ul class="category-list">
+                      <li class="list-items" data-aos="fade-left" data-aos-delay="100">
+                          <a href="#">Software</a>
+                          <span>(05)</span>
+                      </li>
+                      <li class="list-items" data-aos="fade-left" data-aos-delay="200">
+                          <a href="#">Techonlogy</a>
+                          <span>(02)</span>
+                      </li>
+                      <li class="list-items" data-aos="fade-left" data-aos-delay="300">
+                          <a href="#">Lifestyle</a>
+                          <span>(07)</span>
+                      </li>
+                      <li class="list-items" data-aos="fade-left" data-aos-delay="400">
+                          <a href="#">Shopping</a>
+                          <span>(01)</span>
+                      </li>
+                      <li class="list-items" data-aos="fade-left" data-aos-delay="500">
+                          <a href="#">Food</a>
+                          <span>(08)</span>
+                      </li>
+                  </ul>
+              </div>
+              <div class="popular-post">
+                  <h2>Popular Post</h2>
+                  <div class="post-content" data-aos="flip-up" data-aos-delay="200">
+                      <div class="post-image">
+                          <div>
+                              <img src="{{ url_for('static', filename='popular-post/m-blog-1.jpg') }}" class="img" alt="blog1">
+                          </div>
+                          <div class="post-info flex-row">
+                              <span><i class="fas fa-calendar-alt text-gray"></i>&nbsp;&nbsp;January 14,
+                                  2019</span>
+                              <span>2 Commets</span>
+                          </div>
+                      </div>
+                      <div class="post-title">
+                          <a href="#">New data recording system to better analyse road accidents</a>
+                      </div>
+                  </div>
+                  <div class="post-content" data-aos="flip-up" data-aos-delay="300">
+                      <div class="post-image">
+                          <div>
+                              <img src="{{ url_for('static', filename='popular-post/m-blog-2.jpg') }}" class="img" alt="blog1">
+                          </div>
+                          <div class="post-info flex-row">
+                              <span><i class="fas fa-calendar-alt text-gray"></i>&nbsp;&nbsp;January 14,
+                                  2019</span>
+                              <span>2 Commets</span>
+                          </div>
+                      </div>
+                      <div class="post-title">
+                          <a href="#">New data recording system to better analyse road accidents</a>
+                      </div>
+                  </div>
+                  <div class="post-content" data-aos="flip-up" data-aos-delay="400">
+                      <div class="post-image">
+                          <div>
+                              <img src="{{ url_for('static', filename='popular-post/m-blog-3.jpg') }}" class="img" alt="blog1">
+                          </div>
+                          <div class="post-info flex-row">
+                              <span><i class="fas fa-calendar-alt text-gray"></i>&nbsp;&nbsp;January 14,
+                                  2019</span>
+                              <span>2 Commets</span>
+                          </div>
+                      </div>
+                      <div class="post-title">
+                          <a href="#">New data recording system to better analyse road accidents</a>
+                      </div>
+                  </div>
+                  <div class="post-content" data-aos="flip-up" data-aos-delay="500">
+                      <div class="post-image">
+                          <div>
+                              <img src="{{ url_for('static', filename='popular-post/m-blog-4.jpg') }}" class="img" alt="blog1">
+                          </div>
+                          <div class="post-info flex-row">
+                              <span><i class="fas fa-calendar-alt text-gray"></i>&nbsp;&nbsp;January 14,
+                                  2019</span>
+                              <span>2 Commets</span>
+                          </div>
+                      </div>
+                      <div class="post-title">
+                          <a href="#">New data recording system to better analyse road accidents</a>
+                      </div>
+                  </div>
+                  <div class="post-content" data-aos="flip-up" data-aos-delay="600">
+                      <div class="post-image">
+                          <div>
+                              <img src="{{ url_for('static', filename='popular-post/m-blog-5.jpg') }}" class="img" alt="blog1">
+                          </div>
+                          <div class="post-info flex-row">
+                              <span><i class="fas fa-calendar-alt text-gray"></i>&nbsp;&nbsp;January 14,
+                                  2019</span>
+                              <span>2 Commets</span>
+                          </div>
+                      </div>
+                      <div class="post-title">
+                          <a href="#">New data recording system to better analyse road accidents</a>
+                      </div>
+                  </div>
+              </div> -->
+             <div class="newsletter" data-aos="fade-up" data-aos-delay="300">
+                  <h2>Newsletter</h2>
+                  <div class="form-element">
+                      <input type="text" class="input-element" placeholder="Email">
+                      <button class="btn form-btn">Subscribe</button>
+                  </div>
+              </div>
+              <div class="popular-tags">
+                  <h2>Popular Tags</h2>
+                  <div class="tags flex-row">
+                      <span class="tag" data-aos="flip-up" data-aos-delay="100">Software</span>
+                      <span class="tag" data-aos="flip-up" data-aos-delay="200">technology</span>
+                      <span class="tag" data-aos="flip-up" data-aos-delay="300">travel</span>
+                      <span class="tag" data-aos="flip-up" data-aos-delay="400">illustration</span>
+                      <span class="tag" data-aos="flip-up" data-aos-delay="500">design</span>
+                      <span class="tag" data-aos="flip-up" data-aos-delay="600">lifestyle</span>
+                      <span class="tag" data-aos="flip-up" data-aos-delay="700">love</span>
+                      <span class="tag" data-aos="flip-up" data-aos-delay="800">project</span>
+                  </div>
+              </div> 
+          </aside>
+      </div>
+  </section>
 {% endblock content %} 
+
+{% block script %}
+    {{ super() }}
+   
+     
+     <script>
+        $(document).ready(function() {
+          $('#content').summernote();
+        });
+    </script>
+     <!-- --------- Owl-Carousel js ------------------->
+     <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+     
+     <!-- ------------ AOS js Library  ------------------------- -->
+     <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
+     
+     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+{% endblock script %}

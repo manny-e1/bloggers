@@ -43,4 +43,13 @@
         ...
       {% endif %}
     {% endfor %}
-{% endblock content %} 
+{% endblock content %} {% block script %}
+{{ super() }}
+
+
+ <!-- ------------ AOS js Library  ------------------------- -->
+ <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
+ <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
+ <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+{% endblock script %}

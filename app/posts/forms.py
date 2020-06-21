@@ -4,12 +4,12 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import SelectField
 from wtforms.validators import DataRequired
 
-dropdown = [('Software','st'),('Technology',"t"),('Life Style','ls'),('Food','fd')]
+dropdown = [('Software','Software'),('Technology',"Technology"),('Life Style','Life Style'),('Food','Food')]
 class PostForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     description = StringField('description', validators=[DataRequired()])
     tag = SelectField('tag', choices = dropdown, validators=[DataRequired()])
     picture = FileField('Cover Image', validators=[FileAllowed(['jpg', 'png'])])
     content = TextAreaField('Content', validators=[DataRequired()])
-    draft = SubmitField('Drafta')
+    draft = SubmitField('Draft')
     submit = SubmitField('Post')

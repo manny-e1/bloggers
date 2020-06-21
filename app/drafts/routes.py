@@ -3,67 +3,49 @@ from flask import (render_template, url_for, flash,
 from flask_login import current_user, login_required
 from app import db
 from app.models.models import Draft
-from app.posts.forms import PostForm
+from app.drafts.forms import DraftForm
 from app.auth.utils import save_picture
 from . import drafts
 
 
-@posts.route("/post/<int:post_id>", methods=["GET","POST"])
-def post(post_id):
-    post = Post.query.get_or_404(post_id)
-    form = CommentForm()
-    if request.method == 'POST':  
-    if form.validate_on_submit:
-        if form.body.data != None:
-            comment = Comment(body=form.body.data, post=post,
-                            author=current_user)
-            db.session.add(comment)
+@drafts.route("/drafts")
+@login_required
+def draft():
+    page = request.args.get('page', 1, type=int)
+    drafts = Draft.query.order_by(Draft.date_posted.desc()).paginate(page=page, per_page=5)
+    return render_template('public/draft.html', drafts=drafts)
+
+@drafts.route("/draft/<int:draft_id>/update", methods=['GET', 'POST'])
+@login_required
+def update_draft(post_id):
+    draft = Draft.query.get_or_404(post_id)
+    if draft.author != current_user:
+        abort(403)
+    form = DraftForm()
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            draft.title = form.title.data
+            draft.content = form.content.data
             db.session.commit()
-            return redirect(url_for('posts.post',post_id=post.id))
-    comments = Comment.query.filter_by(post=post)\
-        .order_by(Comment.timestamp.desc())
-    return render_template('public/post.html', title=post.title, post=post, comments=comments, form=form)
-
-
-@posts.route("/post/<int:post_id>/update", methods=['GET', 'POST'])
-@login_required
-def update_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    if post.author != current_user:
-        abort(403)
-    form = PostForm()
-    if form.validate_on_submit():
-        post.title = form.title.data
-        post.content = form.content.data
-        db.session.commit()
-        flash('Your post has been updated!', 'success')
-        return redirect(url_for('posts.post', post_id=post.id))
+            flash('Your post has been updated!', 'success')
+            return redirect(url_for('drafts.draft', draft_id=draft.id))
     elif request.method == 'GET':
-        form.title.data = post.title
-        form.content.data = post.content
-    return render_template('public/create_post.html', title='Update Post',
-                           form=form, legend='Update Post')
+        form.title.data = draft.title
+        form.description.data = draft.description
+        form.tag.data = draft.data
+        form.picture.data = draft.picture
+        form.content.data = draft.content
+    return render_template('public/post_draft.html',
+                           form=form, legend='post draft')
 
 
-@posts.route("/post/<int:post_id>/delete", methods=['POST'])
+@drafts.route("/draft/<int:draft_id>/delete", methods=['POST'])
 @login_required
-def delete_post(post_id):
-    post = Post.query.get_or_404(post_id)
-    if post.author != current_user:
+def delete_draft(draft_id):
+    draft = Draft.query.get_or_404(post_id)
+    if draft.author != current_user:
         abort(403)
-    db.session.delete(post)
+    db.session.delete(draft)
     db.session.commit()
-    flash('Your post has been deleted!', 'success')
-    return redirect(url_for('main.home'))
-
-@posts.route('/like/<int:post_id>/<action>')
-@login_required
-def like_action(post_id, action):
-    post = Post.query.filter_by(id=post_id).first_or_404()
-    if action == 'like':
-        current_user.like_post(post)
-        db.session.commit()
-    if action == 'unlike':
-        current_user.unlike_post(post)
-        db.session.commit()
-    return redirect(request.referrer)
+    flash('Your draft has been deleted!', 'success')
+    return redirect(url_for('drafts.draft'))

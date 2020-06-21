@@ -1,4 +1,6 @@
 {% extends "public/layout.html" %}
+
+
 {% block content %}
     <div class="content-section">
       <div class="media">
@@ -55,3 +57,14 @@
         </form>
     </div>
 {% endblock content %} 
+
+{% block script %}
+    {{ super() }}
+   
+    
+     <!-- ------------ AOS js Library  ------------------------- -->
+     <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
+     
+     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+{% endblock script %}

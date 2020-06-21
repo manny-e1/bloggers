@@ -6,6 +6,8 @@ from flask_mail import Mail
 from app.config import Config
 from flask_migrate import Migrate
 from flask_bootstrap import Bootstrap
+from flask_caching import Cache
+
 
 # bcrypt = Bcrypt()
 login_manager = LoginManager()
@@ -14,7 +16,7 @@ login_manager.login_message_category = 'info'
 bootstrap = Bootstrap()
 migrate = Migrate()
 mail = Mail()
-
+cache = Cache(config={'CACHE_TYPE': 'simple'})
 db = SQLAlchemy()
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -26,7 +28,7 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     bootstrap.init_app(app)
     mail.init_app(app)
-    
+    cache.init_app(app)
 
     from app.auth import users
     from app.posts import posts
