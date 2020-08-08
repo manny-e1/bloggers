@@ -1,11 +1,6 @@
 {% extends "public/layout.html" %}
-{% block head_css %}
-    {{ super() }}
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}">
-{% endblock head_css %}
-
 {% block content %}
-    <!-- <div class="content-section">
+    <div class="content-section col-md-4 col-md-offset-4">
         <form method="POST" action="">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
@@ -16,7 +11,7 @@
                         {{ form.username(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
                             {% for error in form.username.errors %}
-                                <span>{{ error }}</span>
+                                <span class="text-danger">{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
@@ -29,7 +24,7 @@
                         {{ form.password(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
                             {% for error in form.password.errors %}
-                                <span>{{ error }}</span>
+                                <span class="text-danger">{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
@@ -43,76 +38,14 @@
             </fieldset>
             <div class="form-group">
                 {{ form.submit(class="btn btn-outline-info") }}
-                <!-- <small class="text-muted ml-2">
-                    <a href="}}">Forgot Password?</a>
-                </small> -->
-      
-
-    <img class="wave" src="{{url_for('static', filename='login-img/wave.png')}}">
-	<div class="container">
-		<div class="img">
-			<img src="{{url_for('static', filename='login-img/bg.svg')}}">
-		</div>
-		<div class="login-content">
-			<form method="POST" action="">
-                {{ form.hidden_tag() }}
-				<img src="img/bg.sv{{url_for('static', filename='login-img/avatar.svg')}}">
-				<h2 class="title">Welcome</h2>
-           		<div class="input-div one">
-           		   <div class="i">
-           		   		<i class="fas fa-user"></i>
-           		   </div>
-           		   <div class="div">
-                        <h5>{{ form.username.label(class="form-control-label") }}</h5>
-                        {% if form.username.errors %}
-                        {{ form.username(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.username.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.username(class="form-control form-control-lg") }}
-                    {% endif %}
-           		   </div>
-           		</div>
-           		<div class="input-div pass">
-           		   <div class="i"> 
-           		    	<i class="fas fa-lock"></i>
-           		   </div>
-           		   <div class="div">
-           		    	<h5>{{ form.password.label(class="form-control-label") }}</h5>
-           		    	
-                    {% if form.password.errors %}
-                        {{ form.password(class="form-control form-control-lg is-invalid") }}
-                        <div class="invalid-feedback">
-                            {% for error in form.password.errors %}
-                                <span>{{ error }}</span>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        {{ form.password(class="form-control form-control-lg") }}
-                    {% endif %}
-            	   </div>
-                </div>
-                <div>
-                    {{ form.remember_me(class="form-check-input") }}
-                    {{ form.remember_me.label(class="form-check-label") }}
-                </div>
-            	<a class='a' href="#">Forgot Password?</a>
-            	{{ form.submit(class="btn btn-outline-info") }}
-            </form>
-        </div>
+                
+            </div>
         </form>
+        <div class="border-top pt-3">
+        <small class="text-muted">
+            Need An Account? <a class="ml-2" href="{{ url_for('users.register') }}">Sign Up Now</a>
+        </small>
     </div>
-{% endblock content %}
-
-{% block script %}
-    {{ super() }}
+    </div>
     
-    <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
-
-     <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
-     
-     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-{% endblock script %}
+{% endblock content %}

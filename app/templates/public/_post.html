@@ -1,0 +1,28 @@
+ <div class="post-content" data-aos="zoom-in" data-aos-delay="200">
+                
+                  <div class="post-image">
+                      <div>
+                        <img  src="{{ url_for('static', filename='profile_pics/' + post.cover_image) }}" class="img" alt="blog1" height="450vh">
+                      </div>
+                      <div class="post-info flex-row">
+                        <span><a href="{{ url_for('users.user_posts', username=post.author.username) }}"><i class="fas fa-user text-gray"></i>&nbsp;&nbsp;{{ post.author.username }}</a></span>
+                          <span><i class="fas fa-calendar-alt text-gray"></i>&nbsp;&nbsp;Jan 27, 2020</span>
+                          <span>{% if current_user.is_authenticated %}
+                            {% if current_user.has_liked_post(post) %}
+                            <a href="{{ url_for('posts.like_action', post_id=post.id, action='unlike') }}">Unlike</a>
+                            {% else %}
+                            <a href="{{ url_for('posts.like_action', post_id=post.id, action='like') }}">Like</a>
+                            {% endif %}
+                            {{ post.likes.count() }}
+                          {% else %}
+                            {{ post.likes.count() }}
+                          {% endif %}</span>
+                          <span>{{post.comments.count()}} comments</span>
+                      </div>
+                  </div>
+                  <div class="post-title">
+                    <a href="{{ url_for('posts.post', post_id=post.id) }}">{{ post.title }}</a>
+                    <p>{{ post.description }} </p>
+                    <a href="{{ url_for('posts.post', post_id=post.id) }}"><button class="btn post-btn">Read More &nbsp; <i class="fas fa-arrow-right"></i></button></a>
+                  </div>
+              </div>

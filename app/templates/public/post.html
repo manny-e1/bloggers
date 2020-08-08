@@ -1,5 +1,4 @@
 {% extends "public/layout.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
 {% block content %}
   <div class="container">
     <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pics/' + post.author.image_file) }}">
@@ -44,12 +43,7 @@
   </ul>
   </div>
   
-  <h3>Leave a Comment</h3>
-  <form action="" method="post">
-    <div class="comment-form">
-      {{ wtf.quick_form(form) }}
-  </div>
-  </form>
+  
 
  
 {% endblock content %}

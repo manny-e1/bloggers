@@ -1,111 +1,97 @@
 {% extends "public/layout.html" %}
 
-{% block head_css %}
+{% block head %}
     {{ super() }}
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"> 
-    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote.min.css" rel="stylesheet">
-{% endblock head_css %}
+    <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet">
+     <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script>
 
-{% block head_script %}
-    {{ super() }}
-    
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote.min.js"></script> 
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-{% endblock head_script %}
-
+{% endblock head %}
 
 {% block content %}
-<div class="content-section">
-    <form method="POST" action="" enctype="multipart/form-data">
-        {{ form.hidden_tag() }}
-        <fieldset class="form-group">
-            <legend class="border-bottom mb-4">{{ legend }}</legend>
-            <div class="form-group">
-                {{ form.title.label(class="form-control-label") }}
-                {% if form.title.errors %}
-                    {{ form.title(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.title.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.title(class="form-control form-control-lg") }}
-                {% endif %}
-            </div>
-            <div class="form-group">
-                {{ form.description.label(class="form-control-label") }}
-                {% if form.description.errors %}
-                    {{ form.description(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.description.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.description(class="form-control form-control-lg") }}
-                {% endif %}
-            </div>
+    <div class="content-section">
+        <form method="POST" action="" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">{{ legend }}</legend>
+                <div class="form-group">
+                    {{ form.title.label(class="form-control-label") }}
+                    {% if form.title.errors %}
+                        {{ form.title(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.title.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.title(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.description.label(class="form-control-label") }}
+                    {% if form.description.errors %}
+                        {{ form.description(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.description.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.description(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
 
-            <div class="form-group">
-                {{ form.tag.label(class="form-control-label") }}
-                {% if form.tag.errors %}
-                    {{ form.tag(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.tag.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.tag(class="form-control form-control-lg") }}
-                {% endif %}
-            </div>
+                <div class="form-group">
+                    {{ form.tag.label(class="form-control-label") }}
+                    {% if form.tag.errors %}
+                        {{ form.tag(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.tag.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.tag(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
 
-            <div class="form-group">
-                {{ form.picture.label() }}
+                <div class="form-group">
+                    {{ form.picture.label() }}
                     {{ form.picture(class="form-control-file") }}
                     {% if form.picture.errors %}
                         {% for error in form.picture.errors %}
                             <span class="text-danger">{{ error }}</span></br>
                         {% endfor %}
                     {% endif %}
-            </div>
+                </div>
+                <div class="form-group">
+                    {{ form.content.label(class="form-control-label") }}
+                    {% if form.content.errors %}
+                        {{ form.content(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.content.errors %}
+                                <span class="text-danger">{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ form.content(class="form-control form-control-lg", id="summernote") }}
+                    {% endif %}
+                </div>
+            </fieldset>
             <div class="form-group">
-                {{ form.content.label(class="form-control-label") }}
-                {% if form.content.errors %}
-                    {{ form.content(class="form-control form-control-lg is-invalid") }}
-                    <div class="invalid-feedback">
-                        {% for error in form.content.errors %}
-                            <span>{{ error }}</span>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    {{ form.content(class="form-control form-control-lg", id="summernote") }}
-                {% endif %}
+                {{ form.submit(class="btn btn-outline-info") }}
+                {{ form.draft(class="btn btn-outline-info") }}
             </div>
-        </fieldset>
-        <div class="form-group">
-            {{ form.submit(class="btn btn-outline-info") }}
-            {{ form.draft(class="btn btn-outline-info") }}
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 {% endblock content %}
 
 {% block script %}
     {{ super() }}
-   
+
     <script>
-        $(document).ready(function() {
-          $('#summernote').summernote();
+        $(document).ready(function () {
+            $('#summernote').summernote();
         });
     </script>
-     <!-- --------- Owl-Carousel js ------------------->
-     
-     <!-- ------------ AOS js Library  ------------------------- -->
-     <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
-     <script src="{{ url_for('static', filename='js/owl.carousel.min.js') }}"></script>
-     
-     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 
 {% endblock script %}

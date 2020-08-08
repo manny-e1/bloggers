@@ -20,7 +20,7 @@ def login():
         if form.validate_on_submit():
             user = User.query.filter_by(username=form.username.data).first()
             if user is None:
-                flash('Invalid username or password')
+                flash('Invalid username or password','danger')
                 return redirect(url_for('users.login'))
             login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
@@ -33,9 +33,7 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('main.home'))
-# @users.route('/')
-# def index():
-#     return 'dfsdni'
+
 
 @users.route('/register', methods=['GET', 'POST'])
 def register():
@@ -47,8 +45,9 @@ def register():
             user = User(username=form.username.data, email=form.email.data, password=form.password.data)
             db.session.add(user)
             db.session.commit()
-            send_email(user)
-            flash('A confirmation email has been sent to you by email.')
+
+            send_email(user, "confirmation")
+            flash('A confirmation email has been sent to you by email.','info')
             return redirect(url_for('users.login'))
     return render_template('public/auth/register.html', form=form)
 
@@ -59,9 +58,9 @@ def confirm_mail(token):
     if current_user.confirmed:
         return redirect(url_for('main.home'))
     if current_user.confirm_email(token):
-        flash('You have confirmed your account. Thanks!')
+        flash('You have confirmed your account. Thanks!', 'success')
     else:
-        flash('The confirmation link is invalid or has expired.')
+        flash('The confirmation link is invalid or has expired.','danger')
     return redirect(url_for('main.home'))
 
 
@@ -83,7 +82,7 @@ def unconfirmed():
 @login_required
 def resend_confirmation():
     send_email(current_user)
-    flash('A new confirmation email has been sent to you by email.')
+    flash('A new confirmation email has been sent to you by email.', 'info')
     return redirect(url_for('main.home'))
 
 @users.route('/change_email/<token>')
@@ -91,9 +90,9 @@ def resend_confirmation():
 def change_email(token):
     if current_user.change_email(token):
         db.session.commit()
-        flash('Your email address has been updated.')
+        flash('Your email address has been updated.','info')
     else:
-        flash('Invalid request.')
+        flash('Invalid request.','error')
     return redirect(url_for('users.account'))
 
 
@@ -109,11 +108,12 @@ def account():
             current_user.username = form.username.data
             if form.username.data != current_user.username:
                 current_user.username = form.username.data
-                flash('Your username has been updated')
+                flash('Your username has been updated','info')
             if form.email.data != current_user.email:    
                 newemail = form.email.data.lower()
-                send_change_email(user=current_user, email=newemail)
-                flash('A confirmation email has been sent to you by email.')
+                # send_change_email(user=current_user, email=newemail)
+                current_user.email = newemail
+                flash('A confirmation email has been sent to you by email.','info')
             db.session.commit()
             return redirect(url_for('users.account'))
     elif request.method == 'GET':
@@ -139,14 +139,14 @@ def user_posts(username):
 def follow(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash('User {} not found.'.format(username))
+        flash('User {} not found.'.format(username),'error')
         return redirect(url_for('main.home'))
     if user == current_user:
-        flash('You cannot follow yourself!')
+        flash('You cannot follow yourself!','warning')
         return redirect(url_for('users.user_posts', username=username))
     current_user.follow(user)
     db.session.commit()
-    flash('You are following {}!'.format(username))
+    flash('You are following {}!'.format(username),'info')
     return redirect(url_for('users.user_posts', username=username))
 
 @users.route('/unfollow/<username>')
@@ -154,12 +154,12 @@ def follow(username):
 def unfollow(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
-        flash('User {} not found.'.format(username))
+        flash('User {} not found.'.format(username),'error')
         return redirect(url_for('main.home'))
     if user == current_user:
-        flash('You cannot unfollow yourself!')
+        flash('You cannot unfollow yourself!','warning')
         return redirect(url_for('users.user_posts', username=username))
     current_user.unfollow(user)
     db.session.commit()
-    flash('You are not following {}.'.format(username))
+    flash('You are not following {}.'.format(username),'warning')
     return redirect(url_for('users.user_posts', username=username))

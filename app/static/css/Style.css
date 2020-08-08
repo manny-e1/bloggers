@@ -223,6 +223,7 @@ main .site-content .post-content > .post-image > div{
 main .site-content .post-content > .post-image .img{
     width: 100%;
     transition: all 1s ease;
+    border-radius: 10px;
 }
 
 main .site-content .post-content > .post-image .img:hover{
@@ -390,7 +391,10 @@ main .post-content .post-title a{
         display: none;
     }
 
-
+    .img{
+        height: 28vh;
+        border-radius: 15px;
+    }
 }
 
 /*        x      Viewport less then or equal to 520px       x     */

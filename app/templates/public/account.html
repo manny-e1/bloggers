@@ -21,7 +21,7 @@
                         {{ form.username(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
                             {% for error in form.username.errors %}
-                                <span>{{ error }}</span>
+                                <span class="text-danger">{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
@@ -34,7 +34,7 @@
                         {{ form.email(class="form-control form-control-lg is-invalid") }}
                         <div class="invalid-feedback">
                             {% for error in form.email.errors %}
-                                <span>{{ error }}</span>
+                                <span class="text-danger">{{ error }}</span>
                             {% endfor %}
                         </div>
                     {% else %}
@@ -57,14 +57,3 @@
         </form>
     </div>
 {% endblock content %} 
-
-{% block script %}
-    {{ super() }}
-   
-    
-     <!-- ------------ AOS js Library  ------------------------- -->
-     <script src="{{ url_for('static', filename='js/aos.js') }}"></script>
-     
-     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-
-{% endblock script %}

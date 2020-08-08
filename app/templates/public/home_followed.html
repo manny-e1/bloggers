@@ -1,0 +1,43 @@
+{% extends "public/layout.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/Style.css') }}">
+{% endblock head %}
+
+{% block content %}
+    <section class="container">
+      <div class="site-content">
+          <div class="posts">
+            {% if current_user.is_authenticated %}
+              {% for post in posts.items %}
+                {% include 'public/_post.html' %} 
+              {% endfor %}
+            {% else %}
+              {% for post in random.items %}
+                 {% include 'public/_post.html' %} 
+              {% endfor %}
+            {% endif %}
+              <hr>
+              <div class="pagination flex-row">
+              {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+              
+                {% if page_num %}
+                {% if posts.page == page_num %}
+                  <a href="{{ url_for('main.followed_post', page=page_num) }}" class="pages">{{ page_num }}</a>
+                {% else %}
+                  <a href="{{ url_for('main.followed_post', page=page_num) }}" class="pages">{{ page_num }}</a>
+                {% endif %}
+                {% else %}
+                ...
+              {% endif %}
+              {% endfor %}
+              </div>
+             
+          
+          </div>
+          {% include 'public/_aside.html' %}
+      </div>
+  </section>
+  <hr>
+{% endblock content %}
