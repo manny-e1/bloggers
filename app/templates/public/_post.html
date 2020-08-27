@@ -2,7 +2,7 @@
                 
                   <div class="post-image">
                       <div>
-                        <img  src="{{ url_for('static', filename='profile_pics/' + post.cover_image) }}" class="img" alt="blog1" height="450vh">
+                        <img  src="{{ url_for('static', filename='cover_images/' + post.cover_image) }}" class="img" alt="blog1" height="450vh">
                       </div>
                       <div class="post-info flex-row">
                         <span><a href="{{ url_for('users.user_posts', username=post.author.username) }}"><i class="fas fa-user text-gray"></i>&nbsp;&nbsp;{{ post.author.username }}</a></span>

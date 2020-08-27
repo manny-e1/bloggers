@@ -1,4 +1,7 @@
 import os
+
+
+
 class Config(object):
     SECRET_KEY = "asdfghjkl1234567890"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -7,9 +10,13 @@ class Config(object):
     MAIL_USE_TLS = True
     MAIL_USERNAME = 'tsionambe@gmail.com'
     MAIL_PASSWORD = 'anteneh23'
-    SQLALCHEMY_DATABASE_URI = 'postgres+psycopg2://postgres:anteneh23@localhost:5432/bloggers'
-    CELERY_BROKER_URL = 'amqp://manny:asdfghjkl@localhost/bloggers'
-    CELERY_RESULT_BACKEND = 'amqp://manny:asdfghjkl@localhost/bloggers'
+    SQLALCHEMY_DATABASE_URI = 'postgres+psycopg2://postgres:anteneh23@localhost:5432/blogger'
+    CKEDITOR_SERVE_LOCAL = False
+    CKEDITOR_HEIGHT = 400
+    CKEDITOR_FILE_UPLOADER = 'upload'
+    FLASK_ADMIN_SWATCH ='yeti'
+
+
     
 class DevelopmentConfig(Config):
     DEBUG = True

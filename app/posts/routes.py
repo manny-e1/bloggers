@@ -14,7 +14,7 @@ def new_post():
     form = PostForm()   
     if request.method == 'POST':   
         if form.validate_on_submit():
-            coverImage = save_picture(form.picture.data)
+            coverImage = save_picture(form.picture.data, 'cover_images')
             if form.draft.data:
                 draft = Draft(title=form.title.data, description=form.description.data,   
                 tag = form.tag.data, cover_image=coverImage, content=form.content.data, user=current_user)

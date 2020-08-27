@@ -19,7 +19,7 @@ def login():
     if request.method == 'POST':  
         if form.validate_on_submit():
             user = User.query.filter_by(username=form.username.data).first()
-            if user is None:
+            if user is None or not user.check_password(form.password.data):
                 flash('Invalid username or password','danger')
                 return redirect(url_for('users.login'))
             login_user(user, remember=form.remember_me.data)
@@ -42,10 +42,10 @@ def register():
     form = RegistrationForm()
     if request.method == 'POST':  
         if form.validate_on_submit():
-            user = User(username=form.username.data, email=form.email.data, password=form.password.data)
+            user = User(username=form.username.data, email=form.email.data)
+            user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()
-
             send_email(user, "confirmation")
             flash('A confirmation email has been sent to you by email.','info')
             return redirect(url_for('users.login'))
@@ -103,7 +103,7 @@ def account():
     if request.method == 'POST':  
         if form.validate_on_submit():
             if form.picture.data:
-                picture_file = save_picture(form.picture.data)
+                picture_file = save_picture(form.picture.data,'profile_pics')
                 current_user.image_file = picture_file
             current_user.username = form.username.data
             if form.username.data != current_user.username:

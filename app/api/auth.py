@@ -14,7 +14,7 @@ def verify_password(username, password):
     if user is None:
         return False
     g.current_user = user
-    return True
+    return user.check_password(password)
 
 
 @basic_auth.error_handler
