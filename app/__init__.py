@@ -36,10 +36,12 @@ def create_app(config_class=Config):
     from app.auth import users
     from app.posts import posts
     from app.main import main
+    from app.api import api
     # from flaskblog.errors.handlers import errors
     app.register_blueprint(users)
     app.register_blueprint(posts)
     app.register_blueprint(main)
+    app.register_blueprint(api, url_prefix='/api')
     # app.register_blueprint(errors)
 
     return app

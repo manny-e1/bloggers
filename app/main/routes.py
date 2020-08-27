@@ -29,7 +29,6 @@ def catagory_query(string):
 
 def catagory():
 	software = catagory_query_count("Software")
-	soft = "software"
 	food = catagory_query_count("Food")
 	lifestyle = catagory_query_count("Life Style")
 	technology = catagory_query_count("Technology")
@@ -43,7 +42,6 @@ def home():
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
     randpost = Post.query.order_by(func.random()).paginate(page=page, per_page=5)
-    
     return render_template('public/home.html', posts=posts, popular=most_liked(), random = randpost,
      catagory = catagory())
 

@@ -1,10 +1,14 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app, url_for
 from app import db, login_manager
 from flask_login import UserMixin
 from sqlalchemy import func
 from sqlalchemy.ext.hybrid import hybrid_property
+from werkzeug.security import generate_password_hash, check_password_hash
+import base64
+import json
+import os
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -41,16 +45,18 @@ class PaginatedAPIMixin(object):
         return data
 
 
-class User(db.Model, UserMixin):
+class User(db.Model, UserMixin, PaginatedAPIMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
-    password = db.Column(db.String(60), nullable=False)
+    password = db.Column(db.String(120), nullable=False)
     confirmed = db.Column(db.Boolean, default=False)
-    posts = db.relationship('Post', backref='author', lazy=True)
+    posts = db.relationship('Post', backref='author', lazy='dynamic')
     drafts = db.relationship('Draft', backref='user', lazy=True)
     comments = db.relationship('Comment', backref='author', lazy='dynamic')
+    token = db.Column(db.String(32), index=True, unique=True)
+    token_expiration = db.Column(db.DateTime)
     followed = db.relationship(
         'User', secondary=followers,
         primaryjoin=(followers.c.follower_id == id),
@@ -61,6 +67,12 @@ class User(db.Model, UserMixin):
         'PostLike',
         foreign_keys='PostLike.user_id',
         backref='user', lazy='dynamic')
+
+    def set_password(self, password):
+        self.password = password
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
 
     def is_following(self, user):
         return self.followed.filter(
@@ -156,16 +168,13 @@ class User(db.Model, UserMixin):
         data = {
             'id': self.id,
             'username': self.username,
-            'last_seen': self.last_seen.isoformat() + 'Z',
-            'about_me': self.about_me,
             'post_count': self.posts.count(),
             'follower_count': self.followers.count(),
             'followed_count': self.followed.count(),
             '_links': {
                 'self': url_for('api.get_user', id=self.id),
                 'followers': url_for('api.get_followers', id=self.id),
-                'followed': url_for('api.get_followed', id=self.id),
-                'avatar': self.avatar(128)
+                'followed': url_for('api.get_followed', id=self.id)
             }
         }
         if include_email:
@@ -178,9 +187,27 @@ class User(db.Model, UserMixin):
                 setattr(self, field, data[field])
         if new_user and 'password' in data:
             self.set_password(data['password'])
+    def get_token(self, expires_in=3600):
+        now = datetime.utcnow()
+        if self.token and self.token_expiration > now + timedelta(seconds=60):
+            return self.token
+        self.token = base64.b64encode(os.urandom(24)).decode('utf-8')
+        self.token_expiration = now + timedelta(seconds=expires_in)
+        db.session.add(self)
+        return self.token
+
+    def revoke_token(self):
+        self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
+
+    @staticmethod
+    def check_token(token):
+        user = User.query.filter_by(token=token).first()
+        if user is None or user.token_expiration < datetime.utcnow():
+            return None
+        return user
 
 
-class Post(db.Model):
+class Post(db.Model,PaginatedAPIMixin):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     tag = db.Column(db.String(20), nullable=False)
@@ -200,6 +227,24 @@ class Post(db.Model):
     def __repr__(self):
         return f"Post('{self.title}',{self.id}, '{self.date_posted}')" 
 
+    def to_dict(self):
+        data = {
+            'id': self.id,
+            'title': self.title,
+            'tag': self.tag,
+            'description': self.description,
+            'content': self.content,
+            'cover_image':self.cover_image,
+            'date_posted': self.date_posted,
+            'likes_count': self.likes.count(),
+            'comment_count': self.comments.count(),
+            '_links': {
+                'self': url_for('api.get_post', id=self.id),
+                'comments': url_for('api.get_post_comments', id=self.id)
+            }
+        }
+        return data
+
 class PostLike(db.Model):
     __tablename__ = 'post_like'
     id = db.Column(db.Integer, primary_key=True)
@@ -216,7 +261,19 @@ class Comment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     def __repr__(self):
         return f"Comment('{self.body}','{self.timestamp}')"
-
+    def to_dict(self):
+        data = {
+            'id': self.id,
+            'body': self.body,
+            'author':self.user_id,
+            'post':self.user_id,
+            'timestamp': self.timestamp,
+            '_links': {
+                'self': url_for('api.get_post_comments', id=self.id),
+                'post': url_for('api.get_post', id=self.id)
+            }
+        }
+        return data
 
 class Draft(db.Model):
     id = db.Column(db.Integer, primary_key=True)

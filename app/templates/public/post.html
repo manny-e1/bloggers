@@ -40,7 +40,26 @@
           </div>
       </li>
       {% endfor %}
+
   </ul>
+    <form method="POST">
+      <div class="form-group">
+          {{ form.body.label(class="form-control-label") }}
+          {% if form.body.errors %}
+              {{ form.body(class="form-control form-control-lg is-invalid") }}
+              <div class="invalid-feedback">
+                  {% for error in form.body.errors %}
+                      <span class="text-danger">{{ error }}</span>
+                  {% endfor %}
+              </div>
+          {% else %}
+              {{ form.body(class="form-control form-control-lg") }}
+          {% endif %}
+      </div>
+       <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info") }}
+      </div>
+    </form>
   </div>
   
   
